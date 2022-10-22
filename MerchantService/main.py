@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+import uvicorn
+from infrastructure.app_factory import create_app
 
-app = FastAPI()
-BASE_URL = '/api/v1/merchant'
+app: FastAPI = create_app()
 
-@app.get(f'{BASE_URL}/')
-async def root():
-	return {'message': 'Hello from Merchant Service!'}
+if __name__ == '__main__':
+	uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
