@@ -1,7 +1,9 @@
 from typing import Union
+
 from models.empty_model import EmptyModel
-from persistence.merchant_repository import MerchantRepository
 from models.merchant import Merchant
+from persistence.merchant_repository import MerchantRepository
+
 
 class MerchantService:
     def __init__(self, repository: MerchantRepository):

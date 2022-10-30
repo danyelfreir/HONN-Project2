@@ -1,6 +1,9 @@
+from typing import Tuple
+
 import psycopg2
-from typing import List, Tuple
+
 from persistence.db_config import DbConfig
+
 
 class PostgresConnection:
     def __init__(self, db_config: DbConfig) -> None:

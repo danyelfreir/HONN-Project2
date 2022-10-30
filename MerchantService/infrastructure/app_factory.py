@@ -1,7 +1,9 @@
 from fastapi import FastAPI
-from infrastructure.settings import Settings
-from infrastructure.container import Container
+
 import presentation.endpoints as merchant_endpoints
+from infrastructure.container import Container
+from infrastructure.settings import Settings
+
 
 def create_app() -> FastAPI:
     settings = Settings("./infrastructure/.env")

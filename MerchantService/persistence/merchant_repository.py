@@ -1,7 +1,8 @@
 from typing import Union
+
 from models.empty_model import EmptyModel
-from persistence.postgres_connection import PostgresConnection
 from models.merchant import Merchant
+from persistence.postgres_connection import PostgresConnection
 
 
 class MerchantRepository:
@@ -13,11 +14,11 @@ class MerchantRepository:
         command = """INSERT INTO merchant(name, ssn, email, phone_number, allows_discount)
                      VALUES (%(name)s, %(ssn)s, %(email)s, %(phoneNumber)s, %(allowsDiscount)s)
                      RETURNING merchant_id;"""
-        inserted_merchant_id:int = self.__database_connection.insert(command, merchant_dict)
+        inserted_merchant_id: int = self.__database_connection.insert(command, merchant_dict)
         self.__database_connection.commit()
         return inserted_merchant_id
 
-    def get_merchant(self, merchant_id: int) ->  Union[Merchant, EmptyModel]:
+    def get_merchant(self, merchant_id: int) -> Union[Merchant, EmptyModel]:
         id_dict = {'merchant_id': merchant_id}
         command = """SELECT * FROM merchant
                      WHERE merchant_id = %(merchant_id)s;"""
