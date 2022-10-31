@@ -1,8 +1,9 @@
+import uvicorn
 from fastapi import FastAPI
 
-app = FastAPI()
-BASE_URL = '/api/v1/inventory'
+from infrastructure.app_factory import create_app
 
-@app.get(f'{BASE_URL}/')
-async def root():
-	return {'message': 'Hello from Inventory Service!'}
+app: FastAPI = create_app()
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', host='0.0.0.0', port=8003, reload=True)
