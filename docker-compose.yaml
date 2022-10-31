@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  merchant_service:
+  inventory_service:
+  buyer_service:
+  order_service:
+  payment_service:
+  merchant_database:
+  inventory_database:
+  buyer_database:
+  payment_database:
+  order_exchange:
+  payment_exchange:
+  rabbitmq:
+    image: rabbit
+
+networks:
+  merchant:
+    driver: bridge
+    name: merchant_network
+  inventory:
+    driver: bridge
+    name: inventory_network
+  buyer:
+    driver: bridge
+    name: buyer_network
+  order:
+    driver: bridge
+    name: order_network
+  payment:
+    driver: bridge
+    name: payment_network
+
+volumes:
+
