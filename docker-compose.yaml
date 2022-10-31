@@ -1,35 +1,32 @@
 version: "3.8"
 services:
   merchant_service:
-  inventory_service:
-  buyer_service:
-  order_service:
-  payment_service:
-  merchant_database:
-  inventory_database:
-  buyer_database:
-  payment_database:
-  order_exchange:
-  payment_exchange:
+    build: MerchantService/
+    ports:
+      - 8000:8000
+    depends_on:
+      - rabbitmq
+      - postgres_container
+    environment:
+      - postgres_host=postgres_container
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=merchants
+
+  postgres_container:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5438:5432
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/data
+
   rabbitmq:
-    image: rabbit
-
-networks:
-  merchant:
-    driver: bridge
-    name: merchant_network
-  inventory:
-    driver: bridge
-    name: inventory_network
-  buyer:
-    driver: bridge
-    name: buyer_network
-  order:
-    driver: bridge
-    name: order_network
-  payment:
-    driver: bridge
-    name: payment_network
-
-volumes:
-
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
