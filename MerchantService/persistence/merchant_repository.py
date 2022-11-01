@@ -25,10 +25,10 @@ class MerchantRepository:
         merchant_from_db = self.__database_connection.fetch(command, id_dict)
         if merchant_from_db is not None:
             return Merchant(
-                name=merchant_from_db[0],
-                ssn=merchant_from_db[1],
-                email=merchant_from_db[2],
-                phoneNumber=merchant_from_db[3],
-                allowsDiscount=merchant_from_db[4]
+                name=merchant_from_db[1],
+                ssn=merchant_from_db[2],
+                email=merchant_from_db[3],
+                phoneNumber=merchant_from_db[4],
+                allowsDiscount=merchant_from_db[5]
             )
         return EmptyModel()
