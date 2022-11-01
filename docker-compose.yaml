@@ -104,12 +104,23 @@ services:
       - ./InventoryService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/inventorydata
 
+  payment_service:
+    build: ./PaymentService
+    restart: always
+    depends_on:
+      - rabbitmq
+    volumes:
+      - payment_service_vol:/app/data
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
+    hostname: 'rabbitmq-host'
     ports:
       - 5672:5672
       - 15672:15672
       
 volumes:
+  data:
+  payment_service_vol:
   postgres-data: 
