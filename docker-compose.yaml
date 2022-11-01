@@ -1,28 +1,68 @@
 version: "3.8"
+networks:
+  merchant_network:
+    driver: bridge
+  inventory_network:
+    driver: bridge
+
 services:
   merchant_service:
-    build: MerchantService/
+    build: ./MerchantService
+    networks:
+      - merchant_network
     ports:
       - 8000:8000
     depends_on:
       - rabbitmq
-      - postgres_container
+      - merchants_db
     environment:
-      - postgres_host=postgres_container
+      - postgres_host=merchants_db
       - postgres_user=postgres
       - postgres_password=postgres
       - postgres_database=merchants
 
-  postgres_container:
+  inventory_service:
+    build: ./InventoryService
+    networks:
+      - inventory_network
+    ports: 
+      - 8003:8003
+    depends_on:
+      - rabbitmq
+      - inventory_db
+    environment:
+      - postgres_host=inventory_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=products
+
+  merchants_db:
     image: postgres:14
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5438:5432
+      - POSTGRES_DB=merchants
+    networks:
+      - merchant_network
+    expose:
+      - 5432
     volumes: 
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/merchantdata
+
+  inventory_db:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=products
+    networks:
+      - inventory_network
+    expose:
+      - 5432
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/inventorydata
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
