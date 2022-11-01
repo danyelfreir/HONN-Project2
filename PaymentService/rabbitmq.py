@@ -1,10 +1,10 @@
 import pika
+from retry import retry
 
 
 class RabbitMQ:
     def __init__(self) -> None:
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='rabbitmq-host'))
+        self.connection = self._get_connection()
         self.channel = self.connection.channel()
 
         # connect to order service exchange
@@ -30,6 +30,11 @@ class RabbitMQ:
                                    auto_ack=True)
         print('[*] Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
+
+    @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
+    def _get_connection(self):
+        return pika.BlockingConnection(
+            pika.ConnectionParameters(host='rabbitmq-host'))
 
     def __del__(self):
         self.connection.close()

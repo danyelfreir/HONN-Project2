@@ -1,3 +1,6 @@
+import json
+
+
 class PaymentService:
     def __init__(self, rabbitmq, database, validator):
         self.rabbitmq = rabbitmq
@@ -6,7 +9,7 @@ class PaymentService:
 
     def start(self):
         """Starts consuming the order queue, passing in the callback function"""
-        self.rabbitmq.start_consuming(self._process_order)
+        self.rabbitmq.consume(self._process_order)
 
     def _process_order(self, ch, method, properties, order):
         """Callback function for rabbitmq consume
@@ -17,6 +20,7 @@ class PaymentService:
             properties (_type_): _description_
             order (_type_): _description_
         """
+        order = json.loads(order)
         print(f" [x] Received {order}")
         is_valid = self.validator.validate(order)
         self.database.insert(order.id, is_valid)

@@ -10,7 +10,7 @@ class Database:
     def _create_table(self):
         sql = """CREATE TABLE IF NOT EXISTS payments(
             order_id INTEGER PRIMARY KEY,
-            success BOOLEAN"""
+            success BOOLEAN)"""
         self._cursor.execute(sql)
 
     def insert(self, order_id, success):
