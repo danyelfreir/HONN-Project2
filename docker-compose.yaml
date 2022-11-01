@@ -1,16 +1,17 @@
-version: '3.8'
-services:
-
 version: "3.8"
 networks:
   merchant_network:
     driver: bridge
   inventory_network:
     driver: bridge
+  buyer_network:
+    driver: bridge
 
 services:
   merchant_service:
     build: ./MerchantService
+    stdin_open: true
+    tty: true
     networks:
       - merchant_network
     ports:
@@ -26,6 +27,8 @@ services:
 
   inventory_service:
     build: ./InventoryService
+    stdin_open: true
+    tty: true
     networks:
       - inventory_network
     ports: 
@@ -38,6 +41,23 @@ services:
       - postgres_user=postgres
       - postgres_password=postgres
       - postgres_database=products
+      
+  buyer_service:
+    build: ./BuyerService
+    stdin_open: true
+    tty: true
+    networks:
+      - buyer_network
+    ports:  
+      - "8002:8002"
+    depends_on:
+      - buyer_db
+      - rabbitmq
+    environment:
+      - postgres_host=buyer_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=buyers
 
   merchants_db:
     image: postgres:14
@@ -50,29 +70,24 @@ services:
       - merchant_network
     expose:
       - 5432
-    volumes: 
-      - ./postgres-data:/var/lib/postgresql/merchantdata
-      
-  buyer_service:
-    build: ./BuyerService
-    stdin_open: true
-    tty: true
-    depends_on:
-      - buyer_db
-    ports:  
-      - "8000:8000"
+    volumes:
+      - ./MerchantService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/merchantdata
+
   buyer_db:
-    image: postgres
+    image: postgres:14
     hostname: buyer_db
     environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_DB: buyer_db
-    ports:
-      - "5432:5432"
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=buyers
+    networks:
+      - buyer_network
+    expose:
+      - 5432
     volumes:
       - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
 
   inventory_db:
     image: postgres:14
@@ -85,8 +100,9 @@ services:
       - inventory_network
     expose:
       - 5432
-    volumes: 
-      - ./postgres-data:/var/lib/postgresql/inventorydata
+    volumes:
+      - ./InventoryService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/inventorydata
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -96,4 +112,4 @@ services:
       - 15672:15672
       
 volumes:
-  data: 
+  postgres-data: 
