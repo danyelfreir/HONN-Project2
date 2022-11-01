@@ -7,14 +7,10 @@ class AbstractHandler(IHandler):
         self._next_handler = None
 
     def set_next(self, handler: IHandler) -> IHandler:
-        if self._next_handler is None:
-            self._next_handler = handler
-        else:
-            self._next_handler.set_next(handler)
+        self._next_handler = handler
         return handler
 
     def handle(self, request: str) -> str:
         if self._next_handler:
             return self._next_handler.handle(request)
-
         return True
