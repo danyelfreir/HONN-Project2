@@ -1,3 +1,6 @@
+version: '3.8'
+services:
+
 version: "3.8"
 networks:
   merchant_network:
@@ -49,6 +52,27 @@ services:
       - 5432
     volumes: 
       - ./postgres-data:/var/lib/postgresql/merchantdata
+      
+  buyer_service:
+    build: ./BuyerService
+    stdin_open: true
+    tty: true
+    depends_on:
+      - buyer_db
+    ports:  
+      - "8000:8000"
+  buyer_db:
+    image: postgres
+    hostname: buyer_db
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: buyer_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - data:/var/lib/postgresql/data
 
   inventory_db:
     image: postgres:14
@@ -70,3 +94,6 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+      
+volumes:
+  data: 
