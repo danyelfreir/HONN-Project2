@@ -17,7 +17,7 @@ router = APIRouter(prefix='/products')
 async def get_products(product_id: str, product_service: ProductService = Depends(Provide[Container.product_service])):
     product: Union[ProductModel, EmptyModel] = product_service.get_product(int(product_id))
     if isinstance(product, EmptyModel):
-        return HTTPException(404, 'Product does not exist')
+        raise HTTPException(404, 'Product does not exist')
     return product
 
 
