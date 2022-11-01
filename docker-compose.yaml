@@ -1,5 +1,58 @@
 version: '3.8'
 services:
+
+version: "3.8"
+networks:
+  merchant_network:
+    driver: bridge
+  inventory_network:
+    driver: bridge
+
+services:
+  merchant_service:
+    build: ./MerchantService
+    networks:
+      - merchant_network
+    ports:
+      - 8000:8000
+    depends_on:
+      - rabbitmq
+      - merchants_db
+    environment:
+      - postgres_host=merchants_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=merchants
+
+  inventory_service:
+    build: ./InventoryService
+    networks:
+      - inventory_network
+    ports: 
+      - 8003:8003
+    depends_on:
+      - rabbitmq
+      - inventory_db
+    environment:
+      - postgres_host=inventory_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=products
+
+  merchants_db:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=merchants
+    networks:
+      - merchant_network
+    expose:
+      - 5432
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/merchantdata
+      
   buyer_service:
     build: ./BuyerService
     stdin_open: true
@@ -20,5 +73,27 @@ services:
     volumes:
       - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - data:/var/lib/postgresql/data
+
+  inventory_db:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=products
+    networks:
+      - inventory_network
+    expose:
+      - 5432
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/inventorydata
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+      
 volumes:
   data: 
