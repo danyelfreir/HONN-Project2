@@ -1,8 +1,17 @@
-from fastapi import FastAPI
+from PaymentService.card_validator import CardValidator
+from database import Database
+from payment_service import PaymentService
+from rabbitmq import RabbitMQ
 
-app = FastAPI()
-BASE_URL = '/api/v1/payment'
 
-@app.get(f'{BASE_URL}/')
-async def root():
-	return {'message': 'Hello from Payment Service!'}
+def main():
+    rabbitmq = RabbitMQ()
+    database = Database()
+    card_validator = CardValidator()
+    payment_service = PaymentService(rabbitmq, database, card_validator)
+
+    payment_service.start()
+
+
+if __name__ == '__main__':
+    main()
