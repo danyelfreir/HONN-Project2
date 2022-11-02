@@ -1,4 +1,4 @@
-from PaymentService.card_validator import CardValidator
+from card_validator import CardValidator
 from database import Database
 from payment_service import PaymentService
 from rabbitmq import RabbitMQ
