@@ -23,4 +23,9 @@ class ForwardOrder(BaseModel):
     credit_card: dict
     total_price: float
 
+class ReservedOrder(BaseModel):
+    order_id: int
+    product_id: int
+    merchant_id: int
+
 
