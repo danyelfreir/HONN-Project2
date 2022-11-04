@@ -28,6 +28,6 @@ class RabbitMQ:
         return pika.BlockingConnection(
             pika.ConnectionParameters(host=environ.get('RABBITMQ_URL')))
 
-    def __del__(self):
+    def close(self):
         self.connection.close()
 

@@ -8,17 +8,16 @@ from infrastructure.rabbitmq import RabbitMQ
 from infrastructure.settings import Settings
 
 
-def create_app() -> Tuple[FastAPI, Events, RabbitMQ]:
+def create_app() -> Tuple[FastAPI, Events]:
     settings = Settings("./infrastructure/.env")
     container = Container()
     container.config.from_pydantic(settings)
     container.wire([inventory_endpoints])
 
     events = container.events_provider()
-    rabbit = container.rabbitmq_provider()
 
     app = FastAPI()
     app.container = container
     app.include_router(inventory_endpoints.router)
 
-    return app, events, rabbit
+    return app, events

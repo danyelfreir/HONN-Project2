@@ -55,7 +55,8 @@ class ProductRepository:
 
     def sell_product(self, product_id: int) -> int:
         command = """UPDATE product
-                     SET quantity = quantity - 1
+                     SET quantity = quantity - 1,
+                         reserved = reserved - 1
                      WHERE product_id = %(product_id)s
                      RETURNING quantity"""
         updated_reservations: int = self.__database_connection.update(command, {'product_id': product_id})

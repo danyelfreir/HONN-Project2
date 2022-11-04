@@ -6,14 +6,14 @@ from presentation.events import Events
 
 
 class InventoryEventHandler(threading.Thread):
-    def __init__(self, rabbit: RabbitMQ, events: Events):
-        print('inside init')
+    # def __init__(self, rabbit: RabbitMQ, events: Events):
+    def __init__(self, events: Events):
         threading.Thread.__init__(self)
-        self.__rabbit = rabbit
+        # self.__rabbit = rabbit
         self.__events = events
 
     def run(self):
-        print("HERE")
+        self.__rabbit = RabbitMQ()
         self.__rabbit.consume(self.__handle)
 
     def __handle(self, ch, method, properties, payment) -> None:
@@ -25,12 +25,14 @@ class InventoryEventHandler(threading.Thread):
             properties (_type_): _description_
             order (_type_): _description_
         """
-        # payment_json = json.loads(payment)
-        payment_json = int(payment)
-        print(properties.headers['is_successful'])
-        if properties.headers['is_successful'] == 'true':
+        payment_json = json.loads(payment)
+        product_id = int(payment_json['product_id'])
+        if properties.headers['is_successful'] == True:
             print(f" [x] Successful purchase")
-            self.__events.sell_item(payment_json)
+            self.__events.sell_item(product_id)
         else:
             print(f" [x] Unsuccessful purchase")
-            self.__events.remove_reservation(payment_json)
+            self.__events.remove_reservation(product_id)
+
+    def stop(self):
+        self.__rabbit.close()
