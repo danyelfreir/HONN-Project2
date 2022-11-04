@@ -20,7 +20,6 @@ async def get_order(order_id: int, order_service: OrderService = Depends(Provide
 	order: Union[Order, EmptyModel] = order_service.get_order(order_id)
 	if isinstance(order, EmptyModel):
 		raise HTTPException(404, 'Order does not exist.')
-	# TODO: change discount to price before returning
 	return order
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
@@ -50,7 +49,7 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 		raise HTTPException(404, 'Product does not belong to merchant.')
 
 	# if merchant does not allow discounts and discount field is other than 0 or null
-	if order['discount'] != 0 and merchant['allowsDiscount'] is False:
+	if (order['discount'] != 0 or order['discount'] is None) and merchant['allowsDiscount'] is False:
 		raise HTTPException(404, 'Merchant does not allow discount.')
 
 	order_to_save = SavedOrder(
@@ -79,12 +78,12 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 
 
 async def get_merchant(merchant_id: int):
-	return requests.get('localhost:8000/merchant/%s', merchant_id)
+	return requests.get('localhost:8001/merchant/%s', merchant_id)
 
 async def get_buyer(buyer_id: int):
-	return requests.get('localhost:8000/buyer/%s', buyer_id)
+	return requests.get('localhost:8002/buyer/%s', buyer_id)
 
 async def get_inventory(product_id: int):
-	return requests.get('localhost:8000/products/%s', product_id)
+	return requests.get('localhost:8003/products/%s', product_id)
 
 

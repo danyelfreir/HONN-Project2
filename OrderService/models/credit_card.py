@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class CreditCard(BaseModel):
-    cardNumber: str
-    expirationMonth: int
-    expirationYear: int
+    card_number: str
+    expiration_month: int
+    expiration_year: int
     cvc: int

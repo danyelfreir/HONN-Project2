@@ -1,4 +1,3 @@
-import string
 from pydantic import BaseModel
 from models.credit_card import CreditCard
 
