@@ -32,3 +32,32 @@ class ProductRepository:
                 reserved=product_from_db[5],
             )
         return EmptyModel()
+
+    def reserve_product(self, product_id: int):
+        id_dict = {'product_id': product_id}
+        command = """UPDATE product
+                     SET reserved = reserved + 1
+                     WHERE product_id = %(product_id)s
+                     RETURNING reserved;"""
+        updated_reservations: int = self.__database_connection.update(command, id_dict)
+        self.__database_connection.commit()
+        return updated_reservations
+
+    def unreserve_product(self, product_id: int) -> int:
+        id_dict = {'product_id': product_id}
+        command = """UPDATE product
+                     SET reserved = reserved - 1
+                     WHERE product_id = %(product_id)s
+                     RETURNING reserved;"""
+        updated_reservations: int = self.__database_connection.update(command, id_dict)
+        self.__database_connection.commit()
+        return updated_reservations
+
+    def sell_product(self, product_id: int) -> int:
+        command = """UPDATE product
+                     SET quantity = quantity - 1
+                     WHERE product_id = %(product_id)s
+                     RETURNING quantity"""
+        updated_reservations: int = self.__database_connection.update(command, {'product_id': product_id})
+        self.__database_connection.commit()
+        return updated_reservations

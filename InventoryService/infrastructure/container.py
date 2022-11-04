@@ -1,10 +1,13 @@
 from dependency_injector import containers, providers
 
 from business.product_service import ProductService
+from infrastructure.event_handler import InventoryEventHandler
+from infrastructure.rabbitmq import RabbitMQ
 from infrastructure.settings import Settings
 from persistence.db_config import DbConfig
 from persistence.product_repository import ProductRepository
 from persistence.postgres_connection import PostgresConnection
+from presentation.events import Events
 
 
 class Container(containers.DeclarativeContainer):
@@ -29,7 +32,22 @@ class Container(containers.DeclarativeContainer):
         database_provider
     )
 
-    product_service = providers.Factory(
+    product_service = providers.Singleton(
         ProductService,
         product_repository
+    )
+
+    rabbitmq_provider = providers.Singleton(
+        RabbitMQ
+    )
+
+    events_provider = providers.Singleton(
+        Events,
+        product_service
+    )
+
+    event_handler = providers.Singleton(
+        InventoryEventHandler,
+        rabbitmq_provider,
+        events_provider
     )

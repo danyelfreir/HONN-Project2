@@ -1,28 +1,20 @@
 import pika
 from retry import retry
+from dotenv import load_dotenv, find_dotenv
+from os import environ
+
+load_dotenv(find_dotenv())
 
 
 class RabbitMQ:
     def __init__(self) -> None:
         self.connection = self._get_connection()
         self.channel = self.connection.channel()
-
-        # connect to order service exchange
-        self.channel.exchange_declare(exchange='order', exchange_type='fanout')
-        result = self.channel.queue_declare(queue='', exclusive=True)
-        self.queue_name = result.method.queue
-        self.channel.queue_bind(exchange='order', queue=self.queue_name)
-        # /
-
-        # create my exchange
         self.channel.exchange_declare(
             exchange='payment', exchange_type='fanout')
-
-    def publish(self, message: str) -> None:
-        self.channel.basic_publish(exchange='payment',
-                                   routing_key='',
-                                   body=message)
-        print(f'[x] Sent {message}')
+        result = self.channel.queue_declare(queue='', exclusive=True)
+        self.queue_name = result.method.queue
+        self.channel.queue_bind(exchange='payment', queue=self.queue_name)
 
     def consume(self, callback) -> None:
         self.channel.basic_consume(queue=self.queue_name,
@@ -34,7 +26,7 @@ class RabbitMQ:
     @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
     def _get_connection(self):
         return pika.BlockingConnection(
-            pika.ConnectionParameters(host='rabbitmq-host'))
+            pika.ConnectionParameters(host=environ.get('RABBITMQ_URL')))
 
     def __del__(self):
         self.connection.close()
