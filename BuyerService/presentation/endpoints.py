@@ -25,6 +25,5 @@ async def get_buyer(buyer_id: str,
 @inject
 async def post_buyer(buyer: Buyer,
                         buyer_service: BuyerService = Depends(Provide[Container.buyer_service])):
-    print('buyer')
     inserted_buyer_id: int = buyer_service.post_buyer(buyer)
     return {'message': f'Inserted buyer with ID {inserted_buyer_id}'}

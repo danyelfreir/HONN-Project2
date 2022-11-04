@@ -1,19 +1,10 @@
 version: "3.8"
-networks:
-  merchant_network:
-    driver: bridge
-  inventory_network:
-    driver: bridge
-  buyer_network:
-    driver: bridge
 
 services:
   merchant_service:
     build: ./MerchantService
     stdin_open: true
     tty: true
-    networks:
-      - merchant_network
     ports:
       - 8000:8000
     depends_on:
@@ -29,8 +20,6 @@ services:
     build: ./InventoryService
     stdin_open: true
     tty: true
-    networks:
-      - inventory_network
     ports: 
       - 8003:8003
     depends_on:
@@ -46,8 +35,6 @@ services:
     build: ./BuyerService
     stdin_open: true
     tty: true
-    networks:
-      - buyer_network
     ports:  
       - "8002:8002"
     depends_on:
@@ -66,10 +53,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=merchants
-    networks:
-      - merchant_network
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
     volumes:
       - ./MerchantService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/merchantdata
@@ -81,10 +66,8 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=buyers
-    networks:
-      - buyer_network
-    expose:
-      - 5432
+    ports:
+      - 5433:5432
     volumes:
       - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/data
@@ -96,10 +79,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=products
-    networks:
-      - inventory_network
-    expose:
-      - 5432
+    ports:
+      - 5434:5432
     volumes:
       - ./InventoryService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/inventorydata
