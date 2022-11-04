@@ -20,8 +20,10 @@ class PaymentService:
             properties (_type_): _description_
             order (_type_): _description_
         """
-        order = json.loads(order)
-        print(f" [x] Received {order}")
-        is_valid = self.validator.validate(order)
-        self.database.insert(order.id, is_valid)
-        self.rabbitmq.publish(is_valid)
+        # order = json.loads(order)
+        print(f" [x] Received {order.decode()}")
+        # is_valid = self.validator.validate(order)
+        # self.database.insert(order.id, is_valid)
+        # self.rabbitmq.publish(is_valid)
+        res = order.decode() + "and processed by payment service"
+        self.rabbitmq.publish(res)
