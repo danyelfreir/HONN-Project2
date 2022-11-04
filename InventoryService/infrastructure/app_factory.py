@@ -1,11 +1,11 @@
-from fastapi import FastAPI
 from typing import Tuple
+
+from fastapi import FastAPI
+
 import presentation.endpoints as inventory_endpoints
-from presentation.events import Events
 from infrastructure.container import Container
-from infrastructure.event_handler import InventoryEventHandler
-from infrastructure.rabbitmq import RabbitMQ
 from infrastructure.settings import Settings
+from presentation.events import Events
 
 
 def create_app() -> Tuple[FastAPI, Events]:

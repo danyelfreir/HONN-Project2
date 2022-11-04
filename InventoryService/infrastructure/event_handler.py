@@ -1,22 +1,19 @@
 import json
-import threading
 
 from infrastructure.rabbitmq import RabbitMQ
 from presentation.events import Events
 
 
-class InventoryEventHandler(threading.Thread):
-    # def __init__(self, rabbit: RabbitMQ, events: Events):
+class InventoryEventHandler:
     def __init__(self, events: Events):
-        threading.Thread.__init__(self)
-        # self.__rabbit = rabbit
+        self.__rabbit = None
         self.__events = events
 
     def run(self):
         self.__rabbit = RabbitMQ()
         self.__rabbit.consume(self.__handle)
 
-    def __handle(self, ch, method, properties, payment) -> None:
+    def __handle(self, ch, method, properties, order) -> None:
         """Callback function for rabbitmq consume
 
         Args:
@@ -25,14 +22,11 @@ class InventoryEventHandler(threading.Thread):
             properties (_type_): _description_
             order (_type_): _description_
         """
-        payment_json = json.loads(payment)
-        product_id = int(payment_json['product_id'])
-        if properties.headers['is_successful'] == True:
+        order_json = json.loads(order)
+        product_id = int(order_json['product_id'])
+        if method.routing_key == 'Payment-Successful':
             print(f" [x] Successful purchase")
             self.__events.sell_item(product_id)
-        else:
+        elif method.routing_key == 'Payment-Failure':
             print(f" [x] Unsuccessful purchase")
             self.__events.remove_reservation(product_id)
-
-    def stop(self):
-        self.__rabbit.close()

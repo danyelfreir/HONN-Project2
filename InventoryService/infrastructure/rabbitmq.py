@@ -1,7 +1,8 @@
-import pika
-from retry import retry
-from dotenv import load_dotenv, find_dotenv
 from os import environ
+
+import pika
+from dotenv import load_dotenv, find_dotenv
+from retry import retry
 
 load_dotenv(find_dotenv())
 
@@ -28,6 +29,8 @@ class RabbitMQ:
         return pika.BlockingConnection(
             pika.ConnectionParameters(host=environ.get('RABBITMQ_URL')))
 
-    def close(self):
+    def __del__(self):
         self.connection.close()
 
+    def close(self):
+        self.connection.close()

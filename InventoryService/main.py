@@ -5,28 +5,23 @@ from fastapi import FastAPI
 
 from infrastructure.app_factory import create_app
 from infrastructure.event_handler import InventoryEventHandler
-from time import sleep
+from presentation.events import Events
 
 app: FastAPI
+events: Events
 app, events = create_app()
-rabbit_process: InventoryEventHandler
+
+
+def start_handler():
+    rabbit = InventoryEventHandler(events)
+    rabbit.run()
 
 
 @app.on_event("startup")
 async def startup_event():
-    global rabbit_process
-    # rabbit_process = InventoryEventHandler(rabbit, events)
-    rabbit_process = InventoryEventHandler(events)
+    rabbit_process = Thread(target=start_handler, daemon=True)
     rabbit_process.start()
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    global rabbit_process
-    rabbit_process.stop()
-
-
 if __name__ == '__main__':
-    # rabbit_process = InventoryEventHandler(events)
-    # rabbit_process.start()
     uvicorn.run('main:app', host='0.0.0.0', port=8003, reload=True)

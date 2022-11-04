@@ -31,7 +31,8 @@ async def post_product(product: ProductModel,
 
 @router.post('/{product_id}', status_code=status.HTTP_200_OK)
 @inject
-async def reserve_product(product_id: int, product_service: ProductService = Depends(Provide[Container.product_service])):
+async def reserve_product(product_id: int,
+                          product_service: ProductService = Depends(Provide[Container.product_service])):
     total_reserved_products = product_service.reserve_product(product_id)
     if total_reserved_products < 0:
         raise HTTPException(404, 'No products to reserve')
