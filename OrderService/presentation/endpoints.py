@@ -11,7 +11,7 @@ from presentation.exchange import Exchange
 
 router = APIRouter(prefix='/orders')
 
-exchange = Exchange()
+# exchange = Exchange()
 
 
 @router.get('/{order_id}', status_code=status.HTTP_200_OK)
