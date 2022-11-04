@@ -5,8 +5,8 @@ services:
     build: ./OrderService
     stdin_open: true
     tty: true
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     depends_on:
       - rabbitmq
       - order_db
@@ -21,7 +21,7 @@ services:
     stdin_open: true
     tty: true
     expose:
-      - 8000
+      - 8002
     depends_on:
       - rabbitmq
       - merchants_db
@@ -51,7 +51,7 @@ services:
     stdin_open: true
     tty: true
     expose:
-      - 8002
+      - 8004
     depends_on:
       - buyer_db
       - rabbitmq
@@ -68,8 +68,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=orders
-    ports:
-      - 5435:5432
+    expose:
+      - 5433
     volumes:
       - ./OrderService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/orderdata

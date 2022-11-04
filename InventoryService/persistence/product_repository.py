@@ -11,8 +11,6 @@ class ProductRepository:
 
     def create_product(self, product: ProductModel):
         product_dict: dict = product.dict()
-        if product.reserved is None:
-            product_dict['reserved'] = 0
         command = """INSERT INTO product(merchantId, productName, price, quantity, reserved)
                      VALUES (%(merchantId)s, %(productName)s, %(price)s, %(quantity)s, %(reserved)s)
                      RETURNING product_id;"""

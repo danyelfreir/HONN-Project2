@@ -15,12 +15,12 @@ router = APIRouter(prefix='/api')
 # BUYER ENDPOINTS
 @router.get('/buyers/{buyer_id}', status_code=status.HTTP_200_OK)
 async def get_buyer(buyer_id: int) -> Union[dict, None]:
-    return requests.get(f'http://buyer_service:8002/buyers/{buyer_id}').json()
+    return requests.get(f'http://buyer_service:8004/buyers/{buyer_id}').json()
 
 
 @router.post('/buyers/', status_code=status.HTTP_201_CREATED)
 async def post_buyer(buyer: dict) -> int:
-    return requests.post('http://buyer_service:8002/buyers/', json=buyer).json()
+    return requests.post('http://buyer_service:8004/buyers/', json=buyer).json()
 
 # PRODUCT ENDPOINTS
 @router.get('/products/{product_id}', status_code=status.HTTP_200_OK)
@@ -35,12 +35,12 @@ async def post_product(product: dict) -> int:
 # MERCHANT ENDPOINTS
 @router.get('/merchants/{merchant_id}', status_code=status.HTTP_200_OK)
 async def get_merchant(product_id: int):
-    return requests.get(f'http://merchant_service:8000/merchants/{product_id}').json()
+    return requests.get(f'http://merchant_service:8002/merchants/{product_id}').json()
 
 
-@router.post('/merchants/', status_code=status.HTTP_201_CREATED)
+@router.post('/merchants', status_code=status.HTTP_201_CREATED)
 async def post_merchant(merchant: dict) -> int:
-    return requests.post(f'http://merchant_service:8000/merchants/', json=merchant).json()
+    return requests.post(f'http://merchant_service:8002/merchants/', json=merchant).json()
 
 # ORDER ENDPOINTS
 @router.get('/orders/{order_id}', status_code=status.HTTP_201_CREATED)
