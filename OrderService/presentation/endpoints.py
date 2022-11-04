@@ -6,7 +6,7 @@ import requests
 from business.order_service import OrderService
 from infrastructure.container import Container
 from models.empty_model import EmptyModel
-from models.order import Order, SavedOrder, ForwardOrder, ReservedOrder
+from models.order import Order, SavedOrder, ForwardOrder
 from presentation.exchange import Exchange
 
 router = APIRouter(prefix='/orders')
@@ -71,15 +71,10 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 
 	# save with credit card info hidden with ****
 	inserted_order_id: int  = order_service.post_buyer(order_to_save)
-	reserved_order = ReservedOrder(
-		order_id=inserted_order_id,
-		product_id=order['product_id'],
-		merchant_id=order['merchant_id']
-	)
 	# reserve order
-	# post_reserve_inventory(reserved_order)
+	reserved_order = post_reserve_inventory(order['product_id'])
 	# publish order
-	# exchange.publish(order_to_forward)
+	exchange.publish(order_to_forward)
 	print(order_to_forward)
 	return {'message': f'Inserted order with ID {inserted_order_id}'}
 
@@ -94,5 +89,5 @@ async def get_inventory(product_id: int):
 	return requests.get('localhost:8003/products/%s', product_id)
 
 
-async def post_reserve_inventory(reserved_order: ReservedOrder):
-	pass
+async def post_reserve_inventory(product_id: int):
+	return requests.post('localhost:8003/products/%s',product_id)
