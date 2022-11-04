@@ -2,8 +2,8 @@ from pydantic import BaseModel
 
 
 class ProductModel(BaseModel):
-    merchant_id: int
-    product_name: str
+    merchantId: int
+    productName: str
     price: float
     quantity: int
     reserved: int

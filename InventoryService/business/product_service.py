@@ -13,4 +13,5 @@ class ProductService:
         return self.__repo.get_product(product_id)
 
     def post_product(self, product: ProductModel) -> int:
+        print(product)
         return self.__repo.create_product(product)

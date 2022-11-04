@@ -5,8 +5,8 @@ services:
     build: ./MerchantService
     stdin_open: true
     tty: true
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     depends_on:
       - rabbitmq
       - merchants_db
@@ -20,8 +20,8 @@ services:
     build: ./InventoryService
     stdin_open: true
     tty: true
-    ports: 
-      - 8003:8003
+    expose:
+      - 8003
     depends_on:
       - rabbitmq
       - inventory_db
@@ -35,8 +35,8 @@ services:
     build: ./BuyerService
     stdin_open: true
     tty: true
-    ports:  
-      - "8002:8002"
+    expose:
+      - 8002
     depends_on:
       - buyer_db
       - rabbitmq
@@ -53,8 +53,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=merchants
-    ports:
-      - 5432:5432
+    expose:
+      - 5430
     volumes:
       - ./MerchantService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/merchantdata
@@ -66,8 +66,8 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=buyers
-    ports:
-      - 5433:5432
+    expose:
+      - 5431
     volumes:
       - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/data
@@ -79,8 +79,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=products
-    ports:
-      - 5434:5432
+    expose:
+      - 5432
     volumes:
       - ./InventoryService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/inventorydata
@@ -100,6 +100,20 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+  api_service:
+    build: ./ApiService
+    stdin_open: true
+    tty: true
+    depends_on:
+      - buyer_service
+      - inventory_service
+      - merchant_service
+      - payment_service
+    ports:
+      - 8001:8001
+    volumes:
+      - ./ApiService:/app/data
+    
       
 volumes:
   data:

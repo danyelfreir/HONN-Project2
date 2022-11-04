@@ -11,8 +11,10 @@ class ProductRepository:
 
     def create_product(self, product: ProductModel):
         product_dict: dict = product.dict()
-        command = """INSERT INTO product(merchant_id, name, price, quantity, reserved)
-                     VALUES (%(merchant_id)s, %(product_name)s, %(price)s, %(quantity)s, %(reserved)s)
+        if product.reserved is None:
+            product_dict['reserved'] = 0
+        command = """INSERT INTO product(merchantId, productName, price, quantity, reserved)
+                     VALUES (%(merchantId)s, %(productName)s, %(price)s, %(quantity)s, %(reserved)s)
                      RETURNING product_id;"""
         inserted_product_id: int = self.__database_connection.insert(command, product_dict)
         self.__database_connection.commit()
@@ -25,8 +27,8 @@ class ProductRepository:
         product_from_db = self.__database_connection.fetch(command, id_dict)
         if product_from_db is not None:
             return ProductModel(
-                merchant_id=product_from_db[1],
-                product_name=product_from_db[2],
+                merchantId=product_from_db[1],
+                productName=product_from_db[2],
                 price=product_from_db[3],
                 quantity=product_from_db[4],
                 reserved=product_from_db[5],
