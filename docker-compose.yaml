@@ -87,11 +87,22 @@ services:
 
   payment_service:
     build: ./PaymentService
-    restart: always
+    # restart: always
+    tty: true
     depends_on:
       - rabbitmq
+      # - order_service
     volumes:
       - payment_service_vol:/app/data
+
+  email_service:
+    build: ./EmailService
+    # restart: always
+    tty: true
+    depends_on:
+      - rabbitmq
+      - payment_service
+      # - order_service
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
