@@ -1,12 +1,27 @@
 version: "3.8"
 
 services:
+  order_service:
+    build: ./OrderService
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+    depends_on:
+      - rabbitmq
+      - order_db
+    environment:
+      - postgres_host=order_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=orders
+      
   merchant_service:
     build: ./MerchantService
     stdin_open: true
     tty: true
     ports:
-      - 8000:8000
+      - 8001:8001
     depends_on:
       - rabbitmq
       - merchants_db
@@ -45,6 +60,19 @@ services:
       - postgres_user=postgres
       - postgres_password=postgres
       - postgres_database=buyers
+  
+  order_db:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=orders
+    ports:
+      - 5435:5432
+    volumes:
+      - ./OrderService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/orderdata
 
   merchants_db:
     image: postgres:14
@@ -54,7 +82,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=merchants
     ports:
-      - 5432:5432
+      - 5436:5432
     volumes:
       - ./MerchantService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/merchantdata
