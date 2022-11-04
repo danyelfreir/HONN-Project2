@@ -56,13 +56,12 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 
 
 async def get_merchant(merchant_id: int):
-	return requests.get('localhost:8000/merchant/%s', merchant_id)
-
+	return requests.get('localhost:8001/merchant/%s', merchant_id)
 
 async def get_buyer(buyer_id: int):
-	return requests.get('localhost:8000/buyer/%s', buyer_id)
+	return requests.get('localhost:8002/buyer/%s', buyer_id)
 
 async def get_inventory(product_id: int):
-	return requests.get('localhost:8000/products/%s', product_id)
+	return requests.get('localhost:8003/products/%s', product_id)
 
 
