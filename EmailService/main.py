@@ -1,8 +1,22 @@
-from fastapi import FastAPI
+import os
+from dotenv import load_dotenv
+from email_settings import EmailSettings
+from email_client import EmailClient
+from rabbit_mq import RabbitMQ
+from email_service import EmailService
 
-app = FastAPI()
-BASE_URL = '/api/v1/email'
 
-@app.get(f'{BASE_URL}/')
-async def root():
-	return {'message': 'Hello from Email Service!'}
+def main():
+    print("Starting email service...")
+    load_dotenv()
+
+    settings = EmailSettings(os.getenv('USERNAME'), os.getenv('PASSWORD'))
+    email_client = EmailClient(settings)
+    rabbitmq = RabbitMQ()
+
+    email_service = EmailService(email_client, rabbitmq)
+    email_service.start()
+
+
+if __name__ == '__main__':
+    main()

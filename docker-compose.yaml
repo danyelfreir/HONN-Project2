@@ -1,6 +1,21 @@
 version: "3.8"
 
 services:
+  order_service:
+    build: ./OrderService
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+    depends_on:
+      - rabbitmq
+      - order_db
+    environment:
+      - postgres_host=order_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=orders
+      
   merchant_service:
     build: ./MerchantService
     stdin_open: true
@@ -45,6 +60,19 @@ services:
       - postgres_user=postgres
       - postgres_password=postgres
       - postgres_database=buyers
+  
+  order_db:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=orders
+    ports:
+      - 5435:5432
+    volumes:
+      - ./OrderService/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/orderdata
 
   merchants_db:
     image: postgres:14
@@ -87,11 +115,22 @@ services:
 
   payment_service:
     build: ./PaymentService
-    restart: always
+    # restart: always
+    tty: true
     depends_on:
       - rabbitmq
+      # - order_service
     volumes:
       - payment_service_vol:/app/data
+
+  email_service:
+    build: ./EmailService
+    # restart: always
+    tty: true
+    depends_on:
+      - rabbitmq
+      - payment_service
+      # - order_service
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
