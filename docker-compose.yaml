@@ -82,7 +82,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=merchants
     ports:
-      - 5432:5432
+      - 5436:5432
     volumes:
       - ./MerchantService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/merchantdata

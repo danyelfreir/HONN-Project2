@@ -11,8 +11,10 @@ class OrderRepository:
 
     def create_order(self, order: Order):
         order_dict: dict = order.dict()
+        print(order_dict['card_number'])
         # hide card number
-        order_dict['card_number'] = self.__hide_card_number(order_dict['card_number'])
+        hidden_number = self.__hide_card_number(order_dict['card_number'])
+        order_dict['card_number'] = hidden_number
         # sql command
         command = """INSERT INTO orders(product_id, merchant_id, buyer_id, card_number, total_price)
                      VALUES (%(product_id)s, %(merchant_id)s, %(buyer_id)s, %(card_number)s, %(total_price)s)
@@ -39,7 +41,7 @@ class OrderRepository:
             )
         return EmptyModel()
 
-    def __hide_card_number(card_number: str):
+    def __hide_card_number(self, card_number: str):
         str_len = len(card_number)
         stars = '*' * (str_len - 4)
         return stars + card_number[str_len-4:]
