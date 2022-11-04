@@ -3,7 +3,6 @@ from database import Database
 from payment_service import PaymentService
 from rabbitmq import RabbitMQ
 
-
 def main():
     rabbitmq = RabbitMQ()
     database = Database()
