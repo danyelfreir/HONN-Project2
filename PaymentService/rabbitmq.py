@@ -12,29 +12,27 @@ class RabbitMQ:
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.queue_name = result.method.queue
         self.channel.queue_bind(exchange='order', queue=self.queue_name)
-        # /
 
         # create my exchange
         self.channel.exchange_declare(
-            exchange='payment', exchange_type='fanout')
+            exchange='payment', exchange_type='direct')
 
-    def publish(self, message: str) -> None:
+    def publish(self, route, order) -> None:
         self.channel.basic_publish(exchange='payment',
-                                   routing_key='',
-                                   body=message)
-        print(f'[x] Sent {message}')
+                                   routing_key=route,
+                                   body=order)
+        print(f'[x] Sent {order}')
 
     def consume(self, callback) -> None:
         self.channel.basic_consume(queue=self.queue_name,
-                                   on_message_callback=callback,
-                                   auto_ack=True)
+                                   on_message_callback=callback)
         print('[*] Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
 
     @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
     def _get_connection(self):
         return pika.BlockingConnection(
-            pika.ConnectionParameters(host='rabbitmq-host'))
+            pika.ConnectionParameters(host='rabbitmq-host', heartbeat=0)) # I know disabling heartbeats is not recommended.
 
     def __del__(self):
         self.connection.close()

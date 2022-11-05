@@ -10,7 +10,7 @@ class RabbitMQ:
         # declare exhange
         # exchange should already be declared by services, this is a precaution
         self.channel.exchange_declare(exchange='order', exchange_type='fanout') # TODO should not be fanout
-        self.channel.exchange_declare(exchange='payment', exchange_type='fanout')
+        self.channel.exchange_declare(exchange='payment', exchange_type='direct')
 
         # declare two queues, one for order and one for payment
         self.channel.queue_declare(queue='order-queue')

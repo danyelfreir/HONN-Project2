@@ -1,29 +1,26 @@
 import json
+from card_validator import CardValidator
+from rabbitmq import RabbitMQ
 
 
 class PaymentService:
-    def __init__(self, rabbitmq, database, validator):
+    def __init__(self, rabbitmq: RabbitMQ, database, validator : CardValidator):
         self.rabbitmq = rabbitmq
         self.database = database
-        self.validator = validator
+        self.card_validator = validator
 
     def start(self):
         """Starts consuming the order queue, passing in the callback function"""
         self.rabbitmq.consume(self._process_order)
 
-    def _process_order(self, ch, method, properties, order):
-        """Callback function for rabbitmq consume
+    def _process_order(self, ch, method, properties, body):
+        order = json.loads(body.decode())
 
-        Args:
-            ch (_type_): _description_
-            method (_type_): _description_
-            properties (_type_): _description_
-            order (_type_): _description_
-        """
-        # order = json.loads(order)
-        print(f" [x] Received {order.decode()}")
-        # is_valid = self.validator.validate(order)
-        # self.database.insert(order.id, is_valid)
-        # self.rabbitmq.publish(is_valid)
-        res = order.decode() + "and processed by payment service"
-        self.rabbitmq.publish(res)
+        print(f" [x] Received Order {order['order_id']}")
+        card_is_valid = self.card_validator.validate(order["credit_card"])
+        self.database.insert(order['order_id'], card_is_valid)
+
+        route = 'Payment-Successful' if card_is_valid else 'Payment-Failure'
+        self.rabbitmq.publish(route, json.dumps(order))
+
+        ch.basic_ack(delivery_tag=method.delivery_tag)
