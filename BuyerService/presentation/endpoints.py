@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from business.buyer_service import BuyerService
 from infrastructure.container import Container
 from models.empty_model import EmptyModel
-from models.buyer import Buyer
+from models.buyer_model import BuyerModel
+from models.buyer_dto import BuyerDTO
 
 router = APIRouter(prefix='/buyers')
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix='/buyers')
 @inject
 async def get_buyer(buyer_id: str,
                        buyer_service: BuyerService = Depends(Provide[Container.buyer_service])):
-    buyer: Union[Buyer, EmptyModel] = buyer_service.get_buyer(int(buyer_id))
+    buyer: Union[BuyerModel, EmptyModel] = buyer_service.get_buyer(int(buyer_id))
     if isinstance(buyer, EmptyModel):
         raise HTTPException(404, 'Buyer does not exist.')
     return buyer
@@ -23,7 +24,7 @@ async def get_buyer(buyer_id: str,
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 @inject
-async def post_buyer(buyer: Buyer,
+async def post_buyer(buyer: BuyerDTO,
                         buyer_service: BuyerService = Depends(Provide[Container.buyer_service])):
     inserted_buyer_id: int = buyer_service.post_buyer(buyer)
     return {'message': f'Inserted buyer with ID {inserted_buyer_id}'}
