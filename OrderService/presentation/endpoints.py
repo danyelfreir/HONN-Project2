@@ -79,7 +79,7 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 	# save with credit card info hidden with ****
 	inserted_order_id: int  = order_service.post_buyer(order_to_save)
 	# reserve order
-	# reserved_order = post_reserve_inventory(order['product_id'])
+	reserved_order = post_reserve_inventory(order['product_id'])
 	# publish order
 	exchange.publish(order_to_forward.json())
 	print(order_to_forward)

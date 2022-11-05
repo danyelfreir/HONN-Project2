@@ -8,8 +8,8 @@ services:
     expose:
       - 8000
     depends_on:
-      - rabbitmq
       - order_db
+      - rabbitmq-host
     environment:
       - postgres_host=order_db
       - postgres_user=postgres
@@ -23,8 +23,8 @@ services:
     expose:
       - 8002
     depends_on:
-      - rabbitmq
       - merchants_db
+      - rabbitmq-host
     environment:
       - postgres_host=merchants_db
       - postgres_user=postgres
@@ -33,14 +33,13 @@ services:
 
   inventory_service:
     build: ./InventoryService
-    restart: always
     stdin_open: true
     tty: true
     expose:
       - 8003
     depends_on:
-      - rabbitmq
       - inventory_db
+      - rabbitmq-host
     environment:
       - postgres_host=inventory_db
       - postgres_user=postgres
@@ -55,7 +54,7 @@ services:
       - 8004
     depends_on:
       - buyer_db
-      - rabbitmq
+      - rabbitmq-host
     environment:
       - postgres_host=buyer_db
       - postgres_user=postgres
@@ -99,7 +98,7 @@ services:
       - 5431
     volumes:
       - ./BuyerService/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/buyerdata
 
   inventory_db:
     image: postgres:14
@@ -118,7 +117,7 @@ services:
     # restart: always
     tty: true
     depends_on:
-      - rabbitmq
+      - rabbitmq-host
       # - order_service
     volumes:
       - payment_service_vol:/app/data
@@ -128,17 +127,18 @@ services:
     # restart: always
     tty: true
     depends_on:
-      - rabbitmq
       - payment_service
+      - rabbitmq-host
       # - order_service
 
-  rabbitmq:
+  rabbitmq-host:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
+    container_name: 'rabbitmq-host'
     hostname: 'rabbitmq-host'
     ports:
       - 5672:5672
       - 15672:15672
+
   api_service:
     build: ./ApiService
     stdin_open: true
