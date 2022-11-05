@@ -25,9 +25,9 @@ class BuyerRepository:
         buyer_from_db = self.__database_connection.fetch(command, id_dict)
         if buyer_from_db is not None:
             return Buyer(
-                name=buyer_from_db[0],
-                ssn=buyer_from_db[1],
-                email=buyer_from_db[2],
-                phoneNumber=buyer_from_db[3]
+                name=buyer_from_db[1],
+                ssn=buyer_from_db[2],
+                email=buyer_from_db[3],
+                phoneNumber=buyer_from_db[4]
             )
         return EmptyModel()
