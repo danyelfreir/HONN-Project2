@@ -30,12 +30,18 @@ async def get_products(product_id: int) -> Union[dict, None]:
 
 @router.post('/products', status_code=status.HTTP_201_CREATED)
 async def post_product(product: dict) -> int:
+    if "reserved" not in product:
+        product["reserved"] = 0
     return requests.post(f'http://inventory_service:8003/products/',json=product).json()
+
+@router.post('/products/{product_id}', status_code=status.HTTP_201_CREATED)
+async def post_product(product_id: int) -> int:
+    return requests.post(f'http://inventory_service:8003/products/{product_id}').json()
 
 # MERCHANT ENDPOINTS
 @router.get('/merchants/{merchant_id}', status_code=status.HTTP_200_OK)
-async def get_merchant(product_id: int):
-    return requests.get(f'http://merchant_service:8002/merchants/{product_id}').json()
+async def get_merchant(merchant_id: int):
+    return requests.get(f'http://merchant_service:8002/merchants/{merchant_id}').json()
 
 
 @router.post('/merchants', status_code=status.HTTP_201_CREATED)
