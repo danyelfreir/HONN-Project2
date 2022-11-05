@@ -22,5 +22,13 @@ class PostgresConnection:
         except psycopg2.ProgrammingError:
             return ()
 
+    def update(self, sql: str, data: dict) -> int:
+        cursor = self.__conn.cursor()
+        cursor.execute(sql, data)
+        try:
+            return cursor.fetchone()[0]
+        except psycopg2.ProgrammingError:
+            return -1
+
     def commit(self) -> None:
         self.__conn.commit()
