@@ -3,10 +3,10 @@ from Handlers.abstract_handler import AbstractHandler
 
 class CardNumberHandler(AbstractHandler):
     # TODO: Implement the handle method
-    def handle(self, request: str) -> str:
-        card_number = request.card.number
+    def handle(self, card: str) -> str:
+        card_number = card["card_number"]
         if card_number.isnumeric() and self._is_valid(card_number):
-            return super().handle(request)
+            return super().handle(card)
         else:
             return False
 

@@ -67,7 +67,11 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
                 total_price=(1 - order['discount']) * inventory['price']
 	)
 
+	# save with credit card info hidden with ****
+	inserted_order_id: int  = order_service.post_buyer(order_to_save)
+
 	order_to_forward = ForwardOrder(
+		order_id = inserted_order_id,
 		product_id = order['product_id'],
 		merchant_id = order['merchant_id'],
 		buyer_id = order['buyer_id'],
@@ -76,8 +80,6 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 		total_price=(1 - order['discount']) * inventory['price']
 		)
 
-	# save with credit card info hidden with ****
-	inserted_order_id: int  = order_service.post_buyer(order_to_save)
 	# reserve order
 	reserved_order = post_reserve_inventory(order['product_id'])
 	# publish order

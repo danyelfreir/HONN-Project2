@@ -16,6 +16,7 @@ class SavedOrder(BaseModel):
     total_price: float
 
 class ForwardOrder(BaseModel):
+    order_id: int
     product_id: int
     merchant_id: int
     buyer_id: int
