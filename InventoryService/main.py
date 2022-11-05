@@ -7,12 +7,10 @@ from infrastructure.app_factory import create_app
 from infrastructure.event_handler import InventoryEventHandler
 from presentation.events import Events
 
-app: FastAPI
-events: Events
-app, events = create_app()
-
+app: FastAPI = create_app()
 
 def start_handler():
+    events: Events = app.container.events_provider()
     rabbit = InventoryEventHandler(events)
     rabbit.run()
 

@@ -1,10 +1,7 @@
 from os import environ
 
 import pika
-from dotenv import load_dotenv, find_dotenv
 from retry import retry
-
-load_dotenv(find_dotenv())
 
 
 class RabbitMQ:
@@ -27,7 +24,7 @@ class RabbitMQ:
     @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
     def _get_connection(self):
         return pika.BlockingConnection(
-            pika.ConnectionParameters(host=environ.get('RABBITMQ_URL')))
+            pika.ConnectionParameters('rabbitmq-host'))
 
     def __del__(self):
         self.connection.close()
