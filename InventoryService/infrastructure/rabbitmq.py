@@ -9,10 +9,11 @@ class RabbitMQ:
         self.connection = self._get_connection()
         self.channel = self.connection.channel()
         self.channel.exchange_declare(
-            exchange='payment', exchange_type='fanout')
+            exchange='payment', exchange_type='direct')
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.queue_name = result.method.queue
-        self.channel.queue_bind(exchange='payment', queue=self.queue_name)
+        self.channel.queue_bind(exchange='payment', queue=self.queue_name, routing_key='Payment-Successful')
+        self.channel.queue_bind(exchange='payment', queue=self.queue_name, routing_key='Payment-Failure')
 
     def consume(self, callback) -> None:
         self.channel.basic_consume(queue=self.queue_name,

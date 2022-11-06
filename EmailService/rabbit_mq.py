@@ -9,8 +9,8 @@ class RabbitMQ:
 
         # declare exhange
         # exchange should already be declared by services, this is a precaution
-        self.channel.exchange_declare(exchange='order', exchange_type='fanout') # TODO should not be fanout
-        self.channel.exchange_declare(exchange='payment', exchange_type='fanout')
+        self.channel.exchange_declare(exchange='order', exchange_type='fanout')
+        self.channel.exchange_declare(exchange='payment', exchange_type='direct')
 
         # declare two queues, one for order and one for payment
         self.channel.queue_declare(queue='order-queue')
@@ -18,7 +18,8 @@ class RabbitMQ:
 
         # connect queues to respective exchanges
         self.channel.queue_bind(exchange='order', queue='order-queue')
-        self.channel.queue_bind(exchange='payment', queue='payment-queue')
+        self.channel.queue_bind(exchange='payment', queue='payment-queue', routing_key='Payment-Successful')
+        self.channel.queue_bind(exchange='payment', queue='payment-queue', routing_key='Payment-Failure')
 
 
     def consume(self, order_callback, payment_callback) -> None:
@@ -26,7 +27,7 @@ class RabbitMQ:
                                    on_message_callback=order_callback)
         self.channel.basic_consume(queue='payment-queue',
                                    on_message_callback=payment_callback)
-        print('[*] Waiting for messages. To exit press CTRL+C')
+        print('[*] Email Service waiting for messages...')
         self.channel.start_consuming()
 
     @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))

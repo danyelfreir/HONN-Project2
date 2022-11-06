@@ -23,3 +23,4 @@ class ForwardOrder(BaseModel):
     buyer: dict
     credit_card: dict
     total_price: float
+    inventory: dict
