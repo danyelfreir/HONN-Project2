@@ -54,7 +54,7 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 		raise HTTPException(404, 'Product does not belong to merchant.')
 
 	# if merchant does not allow discounts and discount field is other than 0 or null
-	if (order['discount'] != 0 or order['discount'] is None) and merchant['allowsDiscount'] is False:
+	if (order['discount'] != 0 or order['discount'] is None) and merchant['allows_discount'] is False:
 		raise HTTPException(404, 'Merchant does not allow discount.')
 
 	order_to_save = SavedOrder(

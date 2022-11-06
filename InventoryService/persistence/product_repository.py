@@ -11,8 +11,8 @@ class ProductRepository:
 
     def create_product(self, product: ProductModel):
         product_dict: dict = product.dict()
-        command = """INSERT INTO product(merchant_id, name, price, quantity, reserved)
-                     VALUES (%(merchant_id)s, %(name)s, %(price)s, %(quantity)s, %(reserved)s)
+        command = """INSERT INTO product(merchant_id, product_name, price, quantity, reserved)
+                     VALUES (%(merchant_id)s, %(product_name)s, %(price)s, %(quantity)s, %(reserved)s)
                      RETURNING product_id;"""
         inserted_product_id: int = self.__database_connection.insert(command, product_dict)
         self.__database_connection.commit()
