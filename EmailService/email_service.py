@@ -1,20 +1,32 @@
+import json
+
 class EmailService:
     def __init__(self, email_client, rabbitmq):
         self.email_client = email_client
         self.rabbitmq = rabbitmq
 
-    def order(self, ch, method, properties, body):
-        print(f'Received order {body.decode()}')
-        # self.send_email(body.decode())
+    def _order(self, ch, method, properties, body):
+        order = json.loads(body.decode())
+        email = order["buyer"].get("email")
+        
+        message = ["Summary", "-"*15,
+                    f"Order id: {order['order_id']}",
+                    f"Items: {order['inventory'].get('product_name')}",
+                    f"Total: ${order['total_price']}"]
+        self._send_email(email, "Order has been created", message)
 
-    def payment(self, ch, method, properties, body):
-        print(f"Received payment {body.decode()}")
-        # self.send_email(body.decode())
+    def _payment(self, ch, method, properties, body):
+        order = json.loads(body.decode())
+        email = order["buyer"].get("email")
+        if method.routing_key == 'Payment-Successful':
+            self._send_email(email, "Order has been purchased", f"Order {order['order_id']} has been successfully purchased")
+        elif method.routing_key == 'Payment-Failure':
+            self._send_email(email, "Order purchase failed", f"Order {order['order_id']} purchase has failed.")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def send_email(self, email):
-        print("Sending email")
-        self.email_client.send_email('patrekur20@ru.is', "To whom it may concern", email)
+    def _send_email(self, recipient, subject, body):
+        self.email_client.send_email(recipient, subject, body)
 
     def start(self):
         print("[X] Starting email service")
-        self.rabbitmq.consume(self.order, self.payment)
+        self.rabbitmq.consume(self._order, self._payment)

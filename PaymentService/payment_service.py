@@ -16,7 +16,6 @@ class PaymentService:
     def _process_order(self, ch, method, properties, body):
         order = json.loads(body.decode())
 
-        print(f" [x] Received Order {order['order_id']}")
         card_is_valid = self.card_validator.validate(order["credit_card"])
         self.database.insert(order['order_id'], card_is_valid)
 

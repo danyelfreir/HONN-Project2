@@ -31,7 +31,6 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 	if merchant.status_code == 404:
 		raise HTTPException(404, 'Merchant does not exist.')
 	merchant = merchant.json()
-	print(merchant)
 	
 	# if buyer does not exist
 	buyer = get_buyer(order['buyer_id'])
@@ -40,11 +39,9 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 	buyer = buyer.json()
 
 	# if product does not exist
-
 	inventory = get_inventory(order['product_id'])
 	if inventory.status_code == 404:
 		raise HTTPException(404, 'Product does not exist.')
-
 	inventory = inventory.json()
 
 	# if product does exist but is sold out
@@ -77,14 +74,14 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 		buyer_id = order['buyer_id'],
 		buyer = buyer,
 		credit_card = order['credit_card'],
-		total_price=(1 - order['discount']) * inventory['price']
+		total_price=(1 - order['discount']) * inventory['price'],
+		inventory = inventory
 		)
 
 	# reserve order
 	reserved_order = post_reserve_inventory(order['product_id'])
 	# publish order
 	exchange.publish(order_to_forward.json())
-	print(order_to_forward)
 	return {'message': f'Inserted order with ID {inserted_order_id}'}
 
 

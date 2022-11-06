@@ -7,7 +7,7 @@ from email_service import EmailService
 
 
 def main():
-    print("Starting email service...")
+    print('[*] Email Service starting...')
     load_dotenv()
 
     settings = EmailSettings(os.getenv('USERNAME'), os.getenv('PASSWORD'))

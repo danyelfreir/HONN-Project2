@@ -4,6 +4,7 @@ from payment_service import PaymentService
 from rabbitmq import RabbitMQ
 
 def main():
+    print('[*] Payment Service starting...')
     rabbitmq = RabbitMQ()
     database = Database()
     card_validator = CardValidator()
