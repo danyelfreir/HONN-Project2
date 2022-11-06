@@ -79,8 +79,8 @@ async def post_order(order: Order, order_service: OrderService = Depends(Provide
 		inventory = inventory
 		)
 
-	# reserve order
-	reserved_order = post_reserve_inventory(order['product_id'])
+	# reserve product
+	post_reserve_inventory(order['product_id'])
 	# publish order
 	exchange.publish(order_to_forward.json())
 	return {'message': f'Inserted order with ID {inserted_order_id}'}

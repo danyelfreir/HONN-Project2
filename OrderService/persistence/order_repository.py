@@ -11,7 +11,6 @@ class OrderRepository:
 
     def create_order(self, order: Order):
         order_dict: dict = order.dict()
-        print(order_dict['card_number'])
         # hide card number
         hidden_number = self.__hide_card_number(order_dict['card_number'])
         order_dict['card_number'] = hidden_number
@@ -33,13 +32,6 @@ class OrderRepository:
         order_from_db = self.__database_connection.fetch(command, id_dict)
         if order_from_db is not None:
             return SavedOrder(**order_from_db)
-            # return SavedOrder(
-            #     product_id=order_from_db[1],
-            #     merchant_id=order_from_db[2],
-            #     buyer_id=order_from_db[3],
-            #     card_number=order_from_db[4],
-            #     total_price=order_from_db[5] 
-            # )
         return EmptyModel()
 
     def __hide_card_number(self, card_number: str):

@@ -16,7 +16,7 @@ class Exchange:
         self.channel.basic_publish(exchange='order',
                                    routing_key='',
                                    body=message)
-        print(f'[x] Sent {message}')
+        print(f'[x] Sent order {message}')
 
     @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
     def _get_connection(self):
