@@ -2,6 +2,7 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 import requests
+from typing import Union
 
 from business.order_service import OrderService
 from infrastructure.container import Container

@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import psycopg2
+import psycopg2.extras
 
 from persistence.db_config import DbConfig
 
@@ -15,7 +16,7 @@ class PostgresConnection:
         return cursor.fetchone()[0]
 
     def fetch(self, sql, order_id: dict) -> Tuple:
-        cursor = self.__conn.cursor()
+        cursor = self.__conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute(sql, order_id)
         try:
             return cursor.fetchone()

@@ -32,13 +32,14 @@ class OrderRepository:
                      WHERE order_id = %(order_id)s;"""
         order_from_db = self.__database_connection.fetch(command, id_dict)
         if order_from_db is not None:
-            return SavedOrder(
-                product_id=order_from_db[1],
-                merchant_id=order_from_db[2],
-                buyer_id=order_from_db[3],
-                card_number=order_from_db[4],
-                total_price=order_from_db[5] 
-            )
+            return SavedOrder(**order_from_db)
+            # return SavedOrder(
+            #     product_id=order_from_db[1],
+            #     merchant_id=order_from_db[2],
+            #     buyer_id=order_from_db[3],
+            #     card_number=order_from_db[4],
+            #     total_price=order_from_db[5] 
+            # )
         return EmptyModel()
 
     def __hide_card_number(self, card_number: str):
