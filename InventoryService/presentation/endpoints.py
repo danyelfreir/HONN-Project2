@@ -7,6 +7,7 @@ from starlette import status
 from business.product_service import ProductService
 from infrastructure.container import Container
 from models.empty_model import EmptyModel
+from models.product_dto import ProductDTO
 from models.product_model import ProductModel
 
 router = APIRouter(prefix='/products')
@@ -23,7 +24,7 @@ async def get_products(product_id: str, product_service: ProductService = Depend
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 @inject
-async def post_product(product: ProductModel,
+async def post_product(product: ProductDTO,
                        product_service: ProductService = Depends(Provide[Container.product_service])):
     inserted_product_id: int = product_service.post_product(product)
     return {'message': f'Inserted product with ID {inserted_product_id}'}

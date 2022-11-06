@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
 
-class Merchant(BaseModel):
+class BuyerModel(BaseModel):
+    buyer_id: str
     name: str
     ssn: str
     email: str
-    phoneNumber: str
-    allowsDiscount: bool
+    phone_number: str

@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
 
-class ProductModel(BaseModel):
-    product_id: int
+class ProductDTO(BaseModel):
     merchant_id: int
     product_name: str
     price: float
