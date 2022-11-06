@@ -7,6 +7,7 @@ class EmailService:
 
     def _order(self, ch, method, properties, body):
         order = json.loads(body.decode())
+        print(f"[*] Received order {order['order_id']}")
         email = order["buyer"].get("email")
         
         message = ["Summary", "-"*15,
@@ -18,6 +19,7 @@ class EmailService:
 
     def _payment(self, ch, method, properties, body):
         order = json.loads(body.decode())
+        print(f"[*] Received payment for order {order['order_id']}")
         email = order["buyer"].get("email")
         if method.routing_key == 'Payment-Successful':
             self._send_email(email, "Order has been purchased", f"Order {order['order_id']} has been successfully purchased")
