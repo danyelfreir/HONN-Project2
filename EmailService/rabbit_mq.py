@@ -21,6 +21,8 @@ class RabbitMQ:
         self.channel.queue_bind(exchange='payment', queue='payment-queue', routing_key='Payment-Successful')
         self.channel.queue_bind(exchange='payment', queue='payment-queue', routing_key='Payment-Failure')
 
+        self.channel.basic_qos(prefetch_count=1)
+
 
     def consume(self, order_callback, payment_callback) -> None:
         self.channel.basic_consume(queue='order-queue',

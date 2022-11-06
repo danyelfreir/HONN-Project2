@@ -14,6 +14,7 @@ class EmailService:
                     f"Items: {order['inventory'].get('product_name')}",
                     f"Total: ${order['total_price']}"]
         self._send_email(email, "Order has been created", message)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def _payment(self, ch, method, properties, body):
         order = json.loads(body.decode())
