@@ -26,19 +26,16 @@ async def post_buyer(buyer: dict) -> int:
 # PRODUCT ENDPOINTS
 @router.get('/products/{product_id}', status_code=status.HTTP_200_OK)
 async def get_products(product_id: int) -> Union[dict, None]:
-    return requests.get(f'http://inventory_service:8003/products/{product_id}').json()
+    response = requests.get(f'http://inventory_service:8003/products/{product_id}').json()
+    res_dict = {"merchantId": response["merchant_id"], "productName": response["product_name"], "price": response["price"], "quantity": response["quantity"], "reserved": response["reserved"]}
+    return res_dict
 
 
 @router.post('/products/', status_code=status.HTTP_201_CREATED)
 async def post_product(product: dict) -> int:
-    if "reserved" not in product:
-        product["reserved"] = 0
-    return requests.post('http://inventory_service:8003/products/', json=product).json()
-
-
-@router.post('/products/{product_id}', status_code=status.HTTP_201_CREATED)
-async def reserve_product(product_id: int) -> int:
-    return requests.post(f'http://inventory_service:8003/products/{product_id}').json()
+    product["reserved"] = 0
+    req_dict = {"merchant_id": product["merchantId"], "product_name": product["productName"], "price": product["price"], "quantity": product["quantity"], "reserved": 0}
+    return requests.post('http://inventory_service:8003/products/', json=req_dict).json()
 
 
 # MERCHANT ENDPOINTS
@@ -55,9 +52,12 @@ async def post_merchant(merchant: dict) -> int:
 # ORDER ENDPOINTS
 @router.get('/orders/{order_id}', status_code=status.HTTP_201_CREATED)
 async def get_order(order_id: int):
-    return requests.get(f'http://order_service:8000/orders/{order_id}', json=order_id).json()
+    response = requests.get(f'http://order_service:8000/orders/{order_id}', json=order_id).json()
+    res_dict = {"productId": response["product_id"], "merchantId": response["merchant_id"], "buyerId": response["buyer_id"], "cardNumber": response["card_number"], "totalPrice ": response["total_price"]}
+    return res_dict
 
 
 @router.post('/orders', status_code=status.HTTP_201_CREATED)
 async def post_order(order: dict):
-    return requests.post(f'http://order_service:8000/orders/', json=order).json()
+    req_dict = {"product_id": order["productId"], "merchant_id": order["merchantId"], "buyer_id": order["buyerId"], "credit_card": {"card_number": order["creditCard"]["cardNumber"], "expiration_month": order["creditCard"]["expirationMonth"], "expiration_year": order["creditCard"]["expirationYear"], "cvc": order["creditCard"]["cvc"]}, "discount": order["discount"]}
+    return requests.post(f'http://order_service:8000/orders/', json=req_dict).json()
