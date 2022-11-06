@@ -18,7 +18,7 @@ exchange = Exchange()
 @router.get('/{order_id}', status_code=status.HTTP_200_OK)
 @inject
 async def get_order(order_id: int, order_service: OrderService = Depends(Provide[Container.order_service])):
-	order: Union[Order, EmptyModel] = order_service.get_order(order_id)
+	order: Union[SavedOrder, EmptyModel] = order_service.get_order(order_id)
 	if isinstance(order, EmptyModel):
 		raise HTTPException(404, 'Order does not exist.')
 	return order
