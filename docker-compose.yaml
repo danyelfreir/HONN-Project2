@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+  api_service:
+    build: ./ApiService
+    stdin_open: true
+    tty: true
+    depends_on:
+      - buyer_service
+      - inventory_service
+      - merchant_service
+      - payment_service
+    ports:
+      - 8000:8000
+    volumes:
+      - ./ApiService:/app/data
+    
   order_service:
     build: ./OrderService
     stdin_open: true
@@ -23,7 +37,7 @@ services:
     stdin_open: true
     tty: true
     expose:
-      - 8002
+      - 8001
     depends_on:
       - merchants_db
       - rabbitmq-host
@@ -35,6 +49,23 @@ services:
     volumes:
       - ./MerchantService:/app/data
 
+  buyer_service:
+    build: ./BuyerService
+    stdin_open: true
+    tty: true
+    expose:
+      - 8002
+    depends_on:
+      - buyer_db
+      - rabbitmq-host
+    environment:
+      - postgres_host=buyer_db
+      - postgres_user=postgres
+      - postgres_password=postgres
+      - postgres_database=buyers
+    volumes:
+      - ./BuyerService:/app/data
+  
   inventory_service:
     build: ./InventoryService
     stdin_open: true
@@ -51,27 +82,26 @@ services:
       - postgres_database=products
     volumes:
       - ./InventoryService:/app/data
-      
-  buyer_service:
-    build: ./BuyerService
-    stdin_open: true
+
+  payment_service:
+    build: ./PaymentService
     tty: true
-    expose:
-      - 8004
     depends_on:
-      - buyer_db
       - rabbitmq-host
-    environment:
-      - postgres_host=buyer_db
-      - postgres_user=postgres
-      - postgres_password=postgres
-      - postgres_database=buyers
+      - order_service
     volumes:
-      - ./BuyerService:/app/data
-  
+      - payment_service_vol:/app/data
+
+  email_service:
+    build: ./EmailService
+    tty: true
+    depends_on:
+      - payment_service
+      - rabbitmq-host
+      - order_service
+
   order_db:
     image: postgres:14
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -84,7 +114,6 @@ services:
 
   merchants_db:
     image: postgres:14
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -97,7 +126,6 @@ services:
 
   buyer_db:
     image: postgres:14
-    hostname: buyer_db
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
@@ -120,48 +148,12 @@ services:
       - ./InventoryService/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/inventorydata
 
-  payment_service:
-    build: ./PaymentService
-    # restart: always
-    tty: true
-    depends_on:
-      - rabbitmq-host
-      # - order_service
-    volumes:
-      - payment_service_vol:/app/data
-
-  email_service:
-    build: ./EmailService
-    # restart: always
-    tty: true
-    depends_on:
-      - payment_service
-      - rabbitmq-host
-      # - order_service
-
   rabbitmq-host:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq-host'
-    hostname: 'rabbitmq-host'
     ports:
       - 5672:5672
       - 15672:15672
 
-  api_service:
-    build: ./ApiService
-    stdin_open: true
-    tty: true
-    depends_on:
-      - buyer_service
-      - inventory_service
-      - merchant_service
-      - payment_service
-    ports:
-      - 8001:8001
-    volumes:
-      - ./ApiService:/app/data
-    
-      
 volumes:
   data:
   payment_service_vol:
