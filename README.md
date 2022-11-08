@@ -11,8 +11,8 @@
 2. Run `docker compose up -d --scale email_service=2` from the root directory.
 
 ### Request body
-Please make sure to use snake_case in the request body, as the database would not play nice with camelCase.
-For example:
+Please make sure to use snake_case in the request body.
+Like so:
 ```json
 {
     "product_id": 1,
